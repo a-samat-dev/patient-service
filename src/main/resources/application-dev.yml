@@ -1,0 +1,20 @@
+server:
+  port: 5000
+  servlet:
+    context-path: /patient-service
+spring:
+  application:
+    name: patient-service
+  data:
+    mongodb:
+      uri:
+      authentication-database: patientService
+      database: patientService
+      username:
+      password:
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
