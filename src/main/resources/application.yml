@@ -1,0 +1,22 @@
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /patient-service
+spring:
+  application:
+    name: patient-service
+  datasource:
+    url: ${POSTGRES_URL_PATIENT_SERVICE:jdbc:postgresql://localhost:5432/patient_service}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    url: ${POSTGRES_URL_PATIENT_SERVICE:jdbc:postgresql://localhost:5432/patient_service}
+    schemas: public
+    user: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}

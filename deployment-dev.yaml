@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-patient-service-deployment
+  labels:
+    app: dev-patient-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev-patient-service-deployment
+  template:
+    metadata:
+      labels:
+        app: dev-patient-service-deployment
+    spec:
+      containers:
+        - name: dev-patient-service-deployment
+          image: asamatdev/sh-patient-service
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: dev-sh-secrets
+            - configMapRef:
+                name: dev-sh-config-maps
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 200m
+            limits:
+              memory: 256Gi
+              cpu: 300m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev-patient-service
+spec:
+  selector:
+    app: dev-patient-service-deployment
+  ports:
+    - port: 8080
+      targetPort: 8080
