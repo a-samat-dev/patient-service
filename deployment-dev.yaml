@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: dev-patient-service-deployment
-          image: asamatdev/sh-patient-service
+          image: asamatdev/sh-patient-service:0
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
@@ -30,7 +30,7 @@ spec:
               memory: 256Mi
               cpu: 200m
             limits:
-              memory: 256Gi
+              memory: 512Mi
               cpu: 300m
 ---
 apiVersion: v1
