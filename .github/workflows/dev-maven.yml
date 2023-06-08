@@ -1,0 +1,45 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+    types: [opened, synchronize, reopened]
+    
+env:
+  DOCKER_USER: ${{secrets.DOCKER_USER}}
+  DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+  SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
+  GITHUB_TOKEN: ${{secrets.REPO_ACCESS_TOKEN}}
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'corretto'
+        cache: maven
+    - name: Build with Maven
+      run: mvn clean test package
+    - name: Build and analyze
+      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=a-samat-dev_patient-service
+    - name: Log in to Docker Hub
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - name: Build the Docker image
+      run: docker build . --platform linux/amd64 --tag asamatdev/sh-patient-service:${{ secrets.TAG_VERSION }}
+    - name: Push the Docker image
+      run: docker push asamatdev/sh-patient-service:${{ secrets.TAG_VERSION }}
+    - name: Update tag version
+      uses: hmanzur/actions-set-secret@v2.0.0
+      with:
+        name: 'TAG_VERSION'
+        value: $((${{ secrets.TAG_VERSION }}+1))
+        repository: a-samat-dev/patient-service
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}
