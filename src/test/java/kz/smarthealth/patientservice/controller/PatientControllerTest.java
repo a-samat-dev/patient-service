@@ -4,11 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import kz.smarthealth.patientservice.exception.CustomException;
 import kz.smarthealth.patientservice.model.dto.ErrorResponseDTO;
 import kz.smarthealth.patientservice.model.dto.PatientDTO;
 import kz.smarthealth.patientservice.model.dto.UserRole;
-import kz.smarthealth.patientservice.model.entity.PatientEntity;
+import kz.smarthealth.patientservice.model.entity.PatientDocument;
 import kz.smarthealth.patientservice.repository.PatientRepository;
 import kz.smarthealth.patientservice.util.AppConstants;
 import kz.smarthealth.patientservice.util.MessageSource;
@@ -26,6 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.io.UnsupportedEncodingException;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +49,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PatientControllerTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(AppConstants.DEFAULT_OFFSET_DATE_TIME_FORMAT);
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
+            AppConstants.DEFAULT_OFFSET_DATE_TIME_FORMAT);
 
     @Autowired
     private MockMvc mockMvc;
@@ -68,9 +69,6 @@ class PatientControllerTest {
         PatientDTO patientDTO = getPatientDTO();
         patientDTO.setId(null);
         patientDTO.setCreatedAt(null);
-        patientDTO.setUpdatedAt(null);
-        patientDTO.setCreatedBy(null);
-        patientDTO.setUpdatedBy(null);
         String requestBody = objectMapper.writeValueAsString(patientDTO);
         // when
         this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/patients")
@@ -87,9 +85,6 @@ class PatientControllerTest {
         PatientDTO patientDTO = getPatientDTO();
         patientDTO.setId(null);
         patientDTO.setCreatedAt(null);
-        patientDTO.setUpdatedAt(null);
-        patientDTO.setCreatedBy(null);
-        patientDTO.setUpdatedBy(null);
         String requestBody = objectMapper.writeValueAsString(patientDTO);
         // when
         this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/patients")
@@ -111,9 +106,6 @@ class PatientControllerTest {
         patientDTO.setFirstName(null);
         patientDTO.setBirthDate(null);
         patientDTO.setCreatedAt(null);
-        patientDTO.setUpdatedAt(null);
-        patientDTO.setCreatedBy(null);
-        patientDTO.setUpdatedBy(null);
         String requestBody = objectMapper.writeValueAsString(patientDTO);
         // when
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/patients")
@@ -142,9 +134,6 @@ class PatientControllerTest {
         PatientDTO patientDTO = getPatientDTO();
         patientDTO.setId(null);
         patientDTO.setCreatedAt(null);
-        patientDTO.setUpdatedAt(null);
-        patientDTO.setCreatedBy(null);
-        patientDTO.setUpdatedBy(null);
         String requestBody = objectMapper.writeValueAsString(patientDTO);
         // when
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/patients")
@@ -165,9 +154,6 @@ class PatientControllerTest {
         PatientDTO patientDTO = getPatientDTO();
         patientDTO.setId(null);
         patientDTO.setCreatedAt(null);
-        patientDTO.setUpdatedAt(null);
-        patientDTO.setCreatedBy(null);
-        patientDTO.setUpdatedBy(null);
         String requestBody = objectMapper.writeValueAsString(patientDTO);
         // when
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/patients")
@@ -192,10 +178,6 @@ class PatientControllerTest {
         assertNotNull(createdPatientDTO);
         assertNotNull(systemValues.get("id"));
         assertNotNull(systemValues.get("createdAt"));
-        assertNotNull(systemValues.get("createdBy"));
-        assertNotNull(systemValues.get("updatedAt"));
-        assertNotNull(systemValues.get("updatedBy"));
-        assertNull(systemValues.get("deletedAt"));
 
         assertEquals(patientDTO.getUserId(), createdPatientDTO.getUserId());
         assertEquals(patientDTO.getFirstName(), createdPatientDTO.getFirstName());
@@ -209,10 +191,10 @@ class PatientControllerTest {
     @Test
     void getPatientById_returnsUnauthorized_whenUserUnauthorized() throws Exception {
         // given
-        PatientEntity patientEntity = getPatientEntity();
-        patientEntity = patientRepository.save(patientEntity);
+        PatientDocument patientDocument = getPatientEntity();
+        patientDocument = patientRepository.save(patientDocument);
         // when
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/" + patientEntity.getId())
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/" + patientDocument.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isUnauthorized()).andReturn();
@@ -221,10 +203,10 @@ class PatientControllerTest {
     @Test
     void getPatientById_returnsForbidden_whenUserIsNotOwner() throws Exception {
         // given
-        PatientEntity patientEntity = getPatientEntity();
-        patientEntity = patientRepository.save(patientEntity);
+        PatientDocument patientDocument = getPatientEntity();
+        patientDocument = patientRepository.save(patientDocument);
         // when
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/" + patientEntity.getId())
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/" + patientDocument.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("userId", UUID.randomUUID())
                         .header("role", UserRole.ROLE_PATIENT)
@@ -235,55 +217,55 @@ class PatientControllerTest {
     @Test
     void getPatientById_returnsPatient_whenUserIsOwner() throws Exception {
         // given
-        PatientEntity patientEntity = getPatientEntity();
-        patientEntity = patientRepository.save(patientEntity);
+        PatientDocument patientDocument = getPatientEntity();
+        patientDocument = patientRepository.save(patientDocument);
         // when
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/"
-                                + patientEntity.getId())
+                                + patientDocument.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("userId", patientEntity.getUserId())
+                        .header("userId", patientDocument.getUserId())
                         .header("role", UserRole.ROLE_PATIENT)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk()).andReturn();
         // then
-        validateSuccessfulGetResult(patientEntity, mvcResult);
+        validateSuccessfulGetResult(patientDocument, mvcResult);
     }
 
     @Test
     void getPatientById_returnsPatient_underDoctorRole() throws Exception {
         // given
-        PatientEntity patientEntity = getPatientEntity();
-        patientEntity = patientRepository.save(patientEntity);
+        PatientDocument patientDocument = getPatientEntity();
+        patientDocument = patientRepository.save(patientDocument);
         // when
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/"
-                                + patientEntity.getId())
+                                + patientDocument.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("userId", UUID.randomUUID())
                         .header("role", UserRole.ROLE_DOCTOR)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk()).andReturn();
         // then
-        validateSuccessfulGetResult(patientEntity, mvcResult);
+        validateSuccessfulGetResult(patientDocument, mvcResult);
     }
 
     @Test
     void getPatientById_returnsPatient_underOrganizationRole() throws Exception {
         // given
-        PatientEntity patientEntity = getPatientEntity();
-        patientEntity = patientRepository.save(patientEntity);
+        PatientDocument patientDocument = getPatientEntity();
+        patientDocument = patientRepository.save(patientDocument);
         // when
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/"
-                                + patientEntity.getId())
+                                + patientDocument.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("userId", UUID.randomUUID())
                         .header("role", UserRole.ROLE_ORGANIZATION)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk()).andReturn();
         // then
-        validateSuccessfulGetResult(patientEntity, mvcResult);
+        validateSuccessfulGetResult(patientDocument, mvcResult);
     }
 
-    private void validateSuccessfulGetResult(PatientEntity patientEntity, MvcResult mvcResult)
+    private void validateSuccessfulGetResult(PatientDocument patientDocument, MvcResult mvcResult)
             throws JsonProcessingException, UnsupportedEncodingException {
         PatientDTO patientDTO = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
                 PatientDTO.class);
@@ -291,18 +273,16 @@ class PatientControllerTest {
                 new TypeReference<HashMap<String, Object>>() {
                 });
 
-        assertEquals(patientEntity.getId().toString(), systemValues.get("id"));
-        assertEquals(patientEntity.getUserId(), patientDTO.getUserId());
-        assertEquals(patientEntity.getFirstName(), patientDTO.getFirstName());
-        assertEquals(patientEntity.getLastName(), patientDTO.getLastName());
-        assertEquals(patientEntity.getBirthDate(), patientDTO.getBirthDate());
-        assertEquals(patientEntity.getPhoneNumber(), patientDTO.getPhoneNumber());
-        assertEquals(patientEntity.getFamilyConnectionId(), patientDTO.getFamilyConnectionId());
-        assertEquals(patientEntity.getIin(), patientDTO.getIin());
-        assertEquals(dateTimeFormatter.format(patientEntity.getCreatedAt()), systemValues.get("createdAt"));
-        assertEquals(dateTimeFormatter.format(patientEntity.getUpdatedAt()), systemValues.get("updatedAt"));
-        assertEquals(patientEntity.getCreatedBy(), systemValues.get("createdBy"));
-        assertEquals(patientEntity.getUpdatedBy(), systemValues.get("updatedBy"));
+        assertEquals(patientDocument.getId(), systemValues.get("id"));
+        assertEquals(patientDocument.getUserId(), patientDTO.getUserId());
+        assertEquals(patientDocument.getFirstName(), patientDTO.getFirstName());
+        assertEquals(patientDocument.getLastName(), patientDTO.getLastName());
+        assertEquals(patientDocument.getBirthDate(), patientDTO.getBirthDate());
+        assertEquals(patientDocument.getPhoneNumber(), patientDTO.getPhoneNumber());
+        assertEquals(patientDocument.getFamilyConnectionId(), patientDTO.getFamilyConnectionId());
+        assertEquals(patientDocument.getIin(), patientDTO.getIin());
+        assertEquals(patientDocument.getCreatedAt().toEpochSecond(),
+                OffsetDateTime.parse(systemValues.get("createdAt").toString(), dateTimeFormatter).toEpochSecond());
     }
 
     @Test
@@ -328,64 +308,70 @@ class PatientControllerTest {
     @Test
     void getPatientsByUserId_returnsPatients_whenUserIsOwner() throws Exception {
         // given
-        PatientEntity patientEntity1 = getPatientEntity();
-        PatientEntity patientEntity2 = getPatientEntity();
-        patientEntity1 = patientRepository.save(patientEntity1);
-        patientEntity2 = patientRepository.save(patientEntity2);
-        List<PatientEntity> patientEntityList = List.of(patientEntity1, patientEntity2);
+        PatientDocument patientDocument1 = getPatientEntity();
+        PatientDocument patientDocument2 = getPatientEntity();
+        patientDocument1.setId(null);
+        patientDocument2.setId(null);
+        patientDocument1 = patientRepository.save(patientDocument1);
+        patientDocument2 = patientRepository.save(patientDocument2);
+        List<PatientDocument> patientDocumentList = List.of(patientDocument1, patientDocument2);
         // when
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/by-user-id/"
-                                + patientEntity1.getUserId())
+                                + patientDocument1.getUserId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("userId", patientEntity1.getUserId())
+                        .header("userId", patientDocument1.getUserId())
                         .header("role", UserRole.ROLE_PATIENT)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk()).andReturn();
         // then
-        validateSuccessfulGetListResult(patientEntityList, mvcResult);
+        validateSuccessfulGetListResult(patientDocumentList, mvcResult);
     }
 
     @Test
     void getPatientsByUserId_returnsPatients_underDoctorRole() throws Exception {
         // given
-        PatientEntity patientEntity1 = getPatientEntity();
-        PatientEntity patientEntity2 = getPatientEntity();
-        patientEntity1 = patientRepository.save(patientEntity1);
-        patientEntity2 = patientRepository.save(patientEntity2);
-        List<PatientEntity> patientEntityList = List.of(patientEntity1, patientEntity2);
+        PatientDocument patientDocument1 = getPatientEntity();
+        PatientDocument patientDocument2 = getPatientEntity();
+        patientDocument1.setId(null);
+        patientDocument2.setId(null);
+        patientDocument1 = patientRepository.save(patientDocument1);
+        patientDocument2 = patientRepository.save(patientDocument2);
+        List<PatientDocument> patientDocumentList = List.of(patientDocument1, patientDocument2);
         // when
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/by-user-id/"
-                                + patientEntity1.getUserId())
+                                + patientDocument1.getUserId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("userId", UUID.randomUUID())
                         .header("role", UserRole.ROLE_DOCTOR)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk()).andReturn();
         // then
-        validateSuccessfulGetListResult(patientEntityList, mvcResult);
+        validateSuccessfulGetListResult(patientDocumentList, mvcResult);
     }
 
     @Test
     void getPatientsByUserId_returnsPatients_underOrganizationRole() throws Exception {
         // given
-        PatientEntity patientEntity1 = getPatientEntity();
-        PatientEntity patientEntity2 = getPatientEntity();
-        patientEntity1 = patientRepository.save(patientEntity1);
-        patientEntity2 = patientRepository.save(patientEntity2);
-        List<PatientEntity> patientEntityList = List.of(patientEntity1, patientEntity2);
+        PatientDocument patientDocument1 = getPatientEntity();
+        PatientDocument patientDocument2 = getPatientEntity();
+        patientDocument1.setId(null);
+        patientDocument2.setId(null);
+        patientDocument1 = patientRepository.save(patientDocument1);
+        patientDocument2 = patientRepository.save(patientDocument2);
+        List<PatientDocument> patientDocumentList = List.of(patientDocument1, patientDocument2);
         // when
         MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/patients/by-user-id/"
-                                + patientEntity1.getUserId())
+                                + patientDocument1.getUserId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("userId", UUID.randomUUID())
                         .header("role", UserRole.ROLE_ORGANIZATION)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isOk()).andReturn();
         // then
-        validateSuccessfulGetListResult(patientEntityList, mvcResult);
+        validateSuccessfulGetListResult(patientDocumentList, mvcResult);
     }
 
-    private static void validateSuccessfulGetListResult(List<PatientEntity> patientEntityList, MvcResult mvcResult)
+    private static void validateSuccessfulGetListResult(List<PatientDocument> patientDocumentList, MvcResult mvcResult)
             throws JsonProcessingException, UnsupportedEncodingException {
         List<PatientDTO> patientDTOList = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
                 new TypeReference<>() {
@@ -395,14 +381,14 @@ class PatientControllerTest {
                 });
 
         assertFalse(patientDTOList.isEmpty());
-        assertEquals(patientEntityList.size(), patientDTOList.size());
+        assertEquals(patientDocumentList.size(), patientDTOList.size());
 
-        for (int i = 0; i < patientEntityList.size(); i++) {
-            PatientEntity entity = patientEntityList.get(i);
+        for (int i = 0; i < patientDocumentList.size(); i++) {
+            PatientDocument entity = patientDocumentList.get(i);
             PatientDTO dto = patientDTOList.get(i);
             Map<String, Object> systemValues = systemValuesList.get(i);
 
-            assertEquals(entity.getId().toString(), systemValues.get("id"));
+            assertEquals(entity.getId(), systemValues.get("id"));
             assertEquals(entity.getUserId(), dto.getUserId());
             assertEquals(entity.getFirstName(), dto.getFirstName());
             assertEquals(entity.getLastName(), dto.getLastName());
@@ -410,10 +396,8 @@ class PatientControllerTest {
             assertEquals(entity.getPhoneNumber(), dto.getPhoneNumber());
             assertEquals(entity.getFamilyConnectionId(), dto.getFamilyConnectionId());
             assertEquals(entity.getIin(), dto.getIin());
-            assertEquals(dateTimeFormatter.format(entity.getCreatedAt()), systemValues.get("createdAt"));
-            assertEquals(dateTimeFormatter.format(entity.getUpdatedAt()), systemValues.get("updatedAt"));
-            assertEquals(entity.getCreatedBy(), systemValues.get("createdBy"));
-            assertEquals(entity.getUpdatedBy(), systemValues.get("updatedBy"));
+            assertEquals(entity.getCreatedAt().toEpochSecond(),
+                    OffsetDateTime.parse(systemValues.get("createdAt").toString(), dateTimeFormatter).toEpochSecond());
         }
     }
 
@@ -440,10 +424,10 @@ class PatientControllerTest {
     @Test
     void deletePatientById_returnsForbidden_whenUserIsNotOwner() throws Exception {
         // given
-        PatientEntity patientEntity = getPatientEntity();
-        patientEntity = patientRepository.save(patientEntity);
+        PatientDocument patientDocument = getPatientEntity();
+        patientDocument = patientRepository.save(patientDocument);
         // when
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/patients/" + patientEntity.getId())
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/patients/" + patientDocument.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("userId", UUID.randomUUID())
                         .header("role", UserRole.ROLE_PATIENT)
@@ -476,12 +460,12 @@ class PatientControllerTest {
     @Test
     void deletePatientById_deletesPatient_underPatientRole() throws Exception {
         // given
-        PatientEntity patientEntity = getPatientEntity();
-        patientEntity = patientRepository.save(patientEntity);
+        PatientDocument patientDocument = getPatientEntity();
+        patientDocument = patientRepository.save(patientDocument);
         // when
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/patients/" + patientEntity.getId())
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/patients/" + patientDocument.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("userId", patientEntity.getUserId())
+                        .header("userId", patientDocument.getUserId())
                         .header("role", UserRole.ROLE_PATIENT)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isNoContent()).andReturn();
@@ -490,12 +474,12 @@ class PatientControllerTest {
     @Test
     void deletePatientById_deletesPatient_underDoctorRole() throws Exception {
         // given
-        PatientEntity patientEntity = getPatientEntity();
-        patientEntity = patientRepository.save(patientEntity);
+        PatientDocument patientDocument = getPatientEntity();
+        patientDocument = patientRepository.save(patientDocument);
         // when
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/patients/" + patientEntity.getId())
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/patients/" + patientDocument.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("userId", patientEntity.getUserId())
+                        .header("userId", patientDocument.getUserId())
                         .header("role", UserRole.ROLE_DOCTOR)
                         .characterEncoding("utf-8"))
                 .andExpect(status().isNoContent()).andReturn();

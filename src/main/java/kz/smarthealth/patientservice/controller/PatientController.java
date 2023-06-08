@@ -46,7 +46,7 @@ public class PatientController {
     @PostAuthorize("returnObject != null and authentication.principal.username == returnObject.userId.toString() " +
             "or hasRole('ROLE_DOCTOR') or hasRole('ROLE_ORGANIZATION')")
     @Log
-    public PatientDTO getPatientById(@PathVariable UUID id) {
+    public PatientDTO getPatientById(@PathVariable String id) {
         return patientService.getPatientById(id);
     }
 
@@ -58,9 +58,9 @@ public class PatientController {
      */
     @GetMapping("/by-user-id/{userId}")
     @PreAuthorize("hasRole('ROLE_DOCTOR') or hasRole('ROLE_ORGANIZATION') " +
-            "or (authenticated and authentication.principal.username == #userId.toString())")
+            "or (authenticated and authentication.principal.username == #userId)")
     @Log
-    public List<PatientDTO> getPatientsByUserId(@PathVariable UUID userId) {
+    public List<PatientDTO> getPatientsByUserId(@PathVariable String userId) {
         return patientService.getPatientsByUserId(userId);
     }
 
@@ -73,7 +73,7 @@ public class PatientController {
     @Secured({"ROLE_DOCTOR", "ROLE_PATIENT"})
     @Log
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePatientById(@PathVariable UUID id) {
+    public void deletePatientById(@PathVariable String id) {
         patientService.deletePatientById(id);
     }
 }

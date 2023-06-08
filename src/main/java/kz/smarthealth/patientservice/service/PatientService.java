@@ -3,7 +3,7 @@ package kz.smarthealth.patientservice.service;
 import kz.smarthealth.patientservice.aop.Log;
 import kz.smarthealth.patientservice.exception.CustomException;
 import kz.smarthealth.patientservice.model.dto.PatientDTO;
-import kz.smarthealth.patientservice.model.entity.PatientEntity;
+import kz.smarthealth.patientservice.model.entity.PatientDocument;
 import kz.smarthealth.patientservice.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -11,10 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static kz.smarthealth.patientservice.util.MessageSource.PATIENT_BY_ID_NOT_FOUND;
@@ -34,10 +32,11 @@ public class PatientService {
      */
     @Log
     public PatientDTO savePatient(PatientDTO patientDTO) {
-        PatientEntity patientEntity = modelMapper.map(patientDTO, PatientEntity.class);
-        patientEntity = patientRepository.save(patientEntity);
+        PatientDocument patientDocument = modelMapper.map(patientDTO, PatientDocument.class);
+        patientDocument.setCreatedAt(OffsetDateTime.now());
+        patientDocument = patientRepository.save(patientDocument);
 
-        return modelMapper.map(patientEntity, PatientDTO.class);
+        return modelMapper.map(patientDocument, PatientDTO.class);
     }
 
     /**
@@ -47,10 +46,10 @@ public class PatientService {
      * @return existing patient
      */
     @Log
-    public PatientDTO getPatientById(UUID id) {
-        PatientEntity patientEntity = getPatientEntityById(id);
+    public PatientDTO getPatientById(String id) {
+        PatientDocument patientDocument = getPatientEntityById(id);
 
-        return modelMapper.map(patientEntity, PatientDTO.class);
+        return modelMapper.map(patientDocument, PatientDTO.class);
     }
 
     /**
@@ -59,9 +58,9 @@ public class PatientService {
      * @param userId user id
      * @return list of patients
      */
-    public List<PatientDTO> getPatientsByUserId(UUID userId) {
+    public List<PatientDTO> getPatientsByUserId(String userId) {
         return patientRepository.findAllByUserId(userId).stream()
-                .map(entity -> modelMapper.map(entity, PatientDTO.class))
+                .map(document -> modelMapper.map(document, PatientDTO.class))
                 .toList();
     }
 
@@ -70,17 +69,17 @@ public class PatientService {
      *
      * @param id patient id
      */
-    public void deletePatientById(UUID id) {
-        PatientEntity patientEntity = getPatientEntityById(id);
+    public void deletePatientById(String id) {
+        PatientDocument patientDocument = getPatientEntityById(id);
         String authenticatedUserId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        if (!authenticatedUserId.equals(patientEntity.getUserId().toString())) {
+        if (!authenticatedUserId.equals(patientDocument.getUserId())) {
             throw CustomException.builder()
                     .httpStatus(HttpStatus.FORBIDDEN)
                     .build();
         }
 
-        patientRepository.delete(patientEntity);
+        patientRepository.delete(patientDocument);
     }
 
     /**
@@ -89,12 +88,12 @@ public class PatientService {
      * @param id patient id
      * @return patient
      */
-    private PatientEntity getPatientEntityById(UUID id) {
+    private PatientDocument getPatientEntityById(String id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> CustomException.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST)
                         .error(PATIENT_BY_ID_NOT_FOUND.name())
-                        .errorMessage(PATIENT_BY_ID_NOT_FOUND.getText(id.toString()))
+                        .errorMessage(PATIENT_BY_ID_NOT_FOUND.getText(id))
                         .build());
     }
 }

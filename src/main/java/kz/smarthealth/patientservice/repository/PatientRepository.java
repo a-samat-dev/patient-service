@@ -1,14 +1,14 @@
 package kz.smarthealth.patientservice.repository;
 
-import kz.smarthealth.patientservice.model.entity.PatientEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
+import kz.smarthealth.patientservice.model.entity.PatientDocument;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface PatientRepository extends JpaRepository<PatientEntity, UUID> {
+public interface PatientRepository extends MongoRepository<PatientDocument, String> {
 
-    List<PatientEntity> findAllByUserId(UUID userId);
+    List<PatientDocument> findAllByUserId(String userId);
 }

@@ -5,18 +5,13 @@ server:
 spring:
   application:
     name: patient-service
-  datasource:
-    url: ${POSTGRES_URL_PATIENT_SERVICE:jdbc:postgresql://localhost:5432/patient_service}
-    username: ${POSTGRES_USERNAME:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
+  data:
+    mongodb:
+      uri: mongodb+srv://patient-service:pVRZ6QrLH31hcEgW@cluster0.vacjkqi.mongodb.net/patientService
+      database: patientService
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  flyway:
-    url: ${POSTGRES_URL_PATIENT_SERVICE:jdbc:postgresql://localhost:5432/patient_service}
-    schemas: public
-    user: ${POSTGRES_USERNAME:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}

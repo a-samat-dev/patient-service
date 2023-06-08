@@ -1,16 +1,17 @@
 package kz.smarthealth.patientservice.util;
 
 import kz.smarthealth.patientservice.model.dto.PatientDTO;
-import kz.smarthealth.patientservice.model.entity.PatientEntity;
+import kz.smarthealth.patientservice.model.entity.PatientDocument;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public class TestData {
 
-    public static final UUID PATIENT_ID = UUID.randomUUID();
-    public static final UUID USER_ID = UUID.randomUUID();
+    public static final String PATIENT_ID = UUID.randomUUID().toString();
+    public static final String USER_ID = UUID.randomUUID().toString();
     public static final String FIRST_NAME = "FirstName";
     public static final String LAST_NAME = "LastName";
     public static final LocalDate BIRTH_DATE = LocalDate.of(2000, 1, 1);
@@ -29,14 +30,11 @@ public class TestData {
                 .familyConnectionId(FAMILY_CONNECTION_ID)
                 .iin(IIN)
                 .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .createdBy(USER_ID.toString())
-                .updatedBy(USER_ID.toString())
                 .build();
     }
 
-    public static PatientEntity getPatientEntity() {
-        return PatientEntity.builder()
+    public static PatientDocument getPatientEntity() {
+        return PatientDocument.builder()
                 .id(PATIENT_ID)
                 .userId(USER_ID)
                 .firstName(FIRST_NAME)
@@ -46,9 +44,6 @@ public class TestData {
                 .familyConnectionId(FAMILY_CONNECTION_ID)
                 .iin(IIN)
                 .createdAt(OffsetDateTime.now())
-                .updatedAt(OffsetDateTime.now())
-                .createdBy(USER_ID.toString())
-                .updatedBy(USER_ID.toString())
                 .build();
     }
 }

@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -23,10 +24,10 @@ import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 public class PatientDTO {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private UUID id;
+    private String id;
 
     @NotNull
-    private UUID userId;
+    private String userId;
 
     @NotEmpty
     private String firstName;
@@ -46,14 +47,4 @@ public class PatientDTO {
     @JsonFormat(shape = STRING, pattern = AppConstants.DEFAULT_OFFSET_DATE_TIME_FORMAT)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     protected OffsetDateTime createdAt;
-
-    @JsonFormat(shape = STRING, pattern = AppConstants.DEFAULT_OFFSET_DATE_TIME_FORMAT)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    protected OffsetDateTime updatedAt;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    protected String createdBy;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    protected String updatedBy;
 }

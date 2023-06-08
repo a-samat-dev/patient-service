@@ -1,23 +1,10 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-  sql:
-    init:
-      platform: h2
-      schema-locations: classpath:schema.sql
   cloud:
     discovery:
       enabled: false
     config:
       discovery:
         enabled: false
-  flyway:
-    enabled: false
   api-docs:
     path: /api-docs
 eureka:

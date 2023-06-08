@@ -2,7 +2,7 @@ package kz.smarthealth.patientservice.service;
 
 import kz.smarthealth.patientservice.exception.CustomException;
 import kz.smarthealth.patientservice.model.dto.PatientDTO;
-import kz.smarthealth.patientservice.model.entity.PatientEntity;
+import kz.smarthealth.patientservice.model.entity.PatientDocument;
 import kz.smarthealth.patientservice.repository.PatientRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,8 +56,8 @@ class PatientServiceTest {
         // given
         PatientDTO expectedPatientDTO = getPatientDTO();
         expectedPatientDTO.setId(null);
-        PatientEntity patientEntity = getPatientEntity();
-        when(patientRepository.save(any())).thenReturn(patientEntity);
+        PatientDocument patientDocument = getPatientEntity();
+        when(patientRepository.save(any())).thenReturn(patientDocument);
         // when
         PatientDTO actualPatientDTO = underTest.savePatient(expectedPatientDTO);
         // then
@@ -70,15 +70,12 @@ class PatientServiceTest {
         assertEquals(expectedPatientDTO.getFamilyConnectionId(), actualPatientDTO.getFamilyConnectionId());
         assertEquals(expectedPatientDTO.getIin(), actualPatientDTO.getIin());
         assertNotNull(actualPatientDTO.getCreatedAt());
-        assertNotNull(actualPatientDTO.getUpdatedAt());
-        assertNotNull(actualPatientDTO.getCreatedBy());
-        assertNotNull(actualPatientDTO.getUpdatedBy());
     }
 
     @Test
     void getPatientById_throwsException_whenPatientNotFound() {
         // given
-        UUID patientId = UUID.randomUUID();
+        String patientId = UUID.randomUUID().toString();
         when(patientRepository.findById(patientId)).thenReturn(Optional.empty());
         // when
         CustomException exception = assertThrows(CustomException.class,
@@ -86,47 +83,43 @@ class PatientServiceTest {
         // then
         assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
         assertEquals(PATIENT_BY_ID_NOT_FOUND.name(), exception.getError());
-        assertEquals(PATIENT_BY_ID_NOT_FOUND.getText(patientId.toString()), exception.getErrorMessage());
+        assertEquals(PATIENT_BY_ID_NOT_FOUND.getText(patientId), exception.getErrorMessage());
     }
 
     @Test
     void getPatientById_returnsPatient() {
         // given
-        PatientEntity patientEntity = getPatientEntity();
-        when(patientRepository.findById(patientEntity.getId())).thenReturn(Optional.of(patientEntity));
+        PatientDocument patientDocument = getPatientEntity();
+        when(patientRepository.findById(patientDocument.getId())).thenReturn(Optional.of(patientDocument));
         // when
-        PatientDTO patientDTO = underTest.getPatientById(patientEntity.getId());
+        PatientDTO patientDTO = underTest.getPatientById(patientDocument.getId());
         // then
-        assertEquals(patientEntity.getId(), patientDTO.getId());
-        assertEquals(patientEntity.getUserId(), patientDTO.getUserId());
-        assertEquals(patientEntity.getFirstName(), patientDTO.getFirstName());
-        assertEquals(patientEntity.getLastName(), patientDTO.getLastName());
-        assertEquals(patientEntity.getBirthDate(), patientDTO.getBirthDate());
-        assertEquals(patientEntity.getPhoneNumber(), patientDTO.getPhoneNumber());
-        assertEquals(patientEntity.getFamilyConnectionId(), patientDTO.getFamilyConnectionId());
-        assertEquals(patientEntity.getIin(), patientDTO.getIin());
-        assertEquals(patientEntity.getCreatedAt(), patientDTO.getCreatedAt());
-        assertEquals(patientEntity.getUpdatedAt(), patientDTO.getUpdatedAt());
-        assertEquals(patientEntity.getCreatedBy(), patientDTO.getCreatedBy());
-        assertEquals(patientEntity.getUpdatedBy(), patientDTO.getUpdatedBy());
+        assertEquals(patientDocument.getId(), patientDTO.getId());
+        assertEquals(patientDocument.getUserId(), patientDTO.getUserId());
+        assertEquals(patientDocument.getFirstName(), patientDTO.getFirstName());
+        assertEquals(patientDocument.getLastName(), patientDTO.getLastName());
+        assertEquals(patientDocument.getBirthDate(), patientDTO.getBirthDate());
+        assertEquals(patientDocument.getPhoneNumber(), patientDTO.getPhoneNumber());
+        assertEquals(patientDocument.getFamilyConnectionId(), patientDTO.getFamilyConnectionId());
+        assertEquals(patientDocument.getIin(), patientDTO.getIin());
+        assertEquals(patientDocument.getCreatedAt(), patientDTO.getCreatedAt());
     }
 
     @Test
     void getPatientsByUserId_returnsPatients() {
         // given
-        PatientEntity patientEntity1 = getPatientEntity();
-        PatientEntity patientEntity2 = getPatientEntity();
-        patientEntity2.setId(UUID.randomUUID());
-        List<PatientEntity> patientEntityList = List.of(patientEntity1, patientEntity2);
-        when(patientRepository.findAllByUserId(patientEntity1.getUserId()))
-                .thenReturn(patientEntityList);
+        PatientDocument patientDocument1 = getPatientEntity();
+        PatientDocument patientDocument2 = getPatientEntity();
+        patientDocument2.setId(UUID.randomUUID().toString());
+        List<PatientDocument> patientDocumentList = List.of(patientDocument1, patientDocument2);
+        when(patientRepository.findAllByUserId(patientDocument1.getUserId())).thenReturn(patientDocumentList);
         // when
-        List<PatientDTO> actualPatientList = underTest.getPatientsByUserId(patientEntity1.getUserId());
+        List<PatientDTO> actualPatientList = underTest.getPatientsByUserId(patientDocument1.getUserId());
         // then
         assertFalse(actualPatientList.isEmpty());
 
-        for (int i = 0; i < patientEntityList.size(); i++) {
-            PatientEntity entity = patientEntityList.get(0);
+        for (int i = 0; i < patientDocumentList.size(); i++) {
+            PatientDocument entity = patientDocumentList.get(0);
             PatientDTO dto = actualPatientList.get(0);
 
             assertEquals(entity.getId(), dto.getId());
@@ -138,37 +131,34 @@ class PatientServiceTest {
             assertEquals(entity.getFamilyConnectionId(), dto.getFamilyConnectionId());
             assertEquals(entity.getIin(), dto.getIin());
             assertEquals(entity.getCreatedAt(), dto.getCreatedAt());
-            assertEquals(entity.getUpdatedAt(), dto.getUpdatedAt());
-            assertEquals(entity.getCreatedBy(), dto.getCreatedBy());
-            assertEquals(entity.getUpdatedBy(), dto.getUpdatedBy());
         }
     }
 
     @Test
     void deletePatientById_throwsException_whenPatientNotFound() {
         // given
-        UUID id = UUID.randomUUID();
+        String id = UUID.randomUUID().toString();
         when(patientRepository.findById(id)).thenReturn(Optional.empty());
         // when
         CustomException exception = assertThrows(CustomException.class, () -> underTest.deletePatientById(id));
         // then
         assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
         assertEquals(PATIENT_BY_ID_NOT_FOUND.name(), exception.getError());
-        assertEquals(PATIENT_BY_ID_NOT_FOUND.getText(id.toString()), exception.getErrorMessage());
+        assertEquals(PATIENT_BY_ID_NOT_FOUND.getText(id), exception.getErrorMessage());
     }
 
     @Test
     void deletePatientById_throwsException_whenUserIsNotOwner() {
         // given
         UUID userId = UUID.randomUUID();
-        PatientEntity patientEntity = getPatientEntity();
+        PatientDocument patientDocument = getPatientEntity();
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn(userId.toString());
-        when(patientRepository.findById(patientEntity.getId())).thenReturn(Optional.of(patientEntity));
+        when(patientRepository.findById(patientDocument.getId())).thenReturn(Optional.of(patientDocument));
         // when
         CustomException exception = assertThrows(CustomException.class,
-                () -> underTest.deletePatientById(patientEntity.getId()));
+                () -> underTest.deletePatientById(patientDocument.getId()));
         // then
         assertEquals(HttpStatus.FORBIDDEN, exception.getHttpStatus());
         reset(authentication);
@@ -178,19 +168,19 @@ class PatientServiceTest {
     @Test
     void deletePatientById_deletesPatient() {
         // given
-        ArgumentCaptor<PatientEntity> argumentCaptor = ArgumentCaptor.forClass(PatientEntity.class);
-        PatientEntity patientEntity = getPatientEntity();
+        ArgumentCaptor<PatientDocument> argumentCaptor = ArgumentCaptor.forClass(PatientDocument.class);
+        PatientDocument patientDocument = getPatientEntity();
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn(patientEntity.getUserId().toString());
-        when(patientRepository.findById(patientEntity.getId())).thenReturn(Optional.of(patientEntity));
+        when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn(patientDocument.getUserId());
+        when(patientRepository.findById(patientDocument.getId())).thenReturn(Optional.of(patientDocument));
         // when
-        underTest.deletePatientById(patientEntity.getId());
+        underTest.deletePatientById(patientDocument.getId());
         // then
         verify(patientRepository).delete(argumentCaptor.capture());
-        PatientEntity actualPatientEntity = argumentCaptor.getValue();
+        PatientDocument actualPatientDocument = argumentCaptor.getValue();
 
-        assertNotNull(actualPatientEntity.getId());
+        assertNotNull(actualPatientDocument.getId());
         reset(authentication);
         reset(securityContext);
     }
