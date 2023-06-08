@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize, reopened]
     
 env:
-  DOCKER_USER: ${{secrets.DOCKER_USER}}
+  DOCKER_USER: ${{vars.DOCKER_USER}}
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
   SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
   GITHUB_TOKEN: ${{secrets.REPO_ACCESS_TOKEN}}
@@ -33,13 +33,13 @@ jobs:
     - name: Log in to Docker Hub
       run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: Build the Docker image
-      run: docker build . --platform linux/amd64 --tag asamatdev/sh-patient-service:${{ secrets.TAG_VERSION }}
+      run: docker build . --platform linux/amd64 --tag asamatdev/sh-patient-service:${{ vars.TAG_VERSION }}
     - name: Push the Docker image
-      run: docker push asamatdev/sh-patient-service:${{ secrets.TAG_VERSION }}
+      run: docker push asamatdev/sh-patient-service:${{ vars.TAG_VERSION }}
     - name: Update tag version
       uses: hmanzur/actions-set-secret@v2.0.0
       with:
         name: 'TAG_VERSION'
-        value: $((${{ secrets.TAG_VERSION }}+1))
+        value: $((${{ vars.TAG_VERSION }}+1))
         repository: a-samat-dev/patient-service
         token: ${{ secrets.REPO_ACCESS_TOKEN }}
