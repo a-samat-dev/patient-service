@@ -19,7 +19,7 @@ public class PatientKafkaConsumerService {
     private final ObjectMapper objectMapper;
 
     @Log
-    @KafkaListener(topics = "user-service-new-patients", groupId = "group-1")
+    @KafkaListener(topics = "${kafka.topics.new-patients}", groupId = "kafka.topics.new-patients-group-id")
     public void consume(String message) throws JsonProcessingException {
         PatientDocument patientDocument = objectMapper.readValue(message, PatientDocument.class);
         patientDocument.setCreatedAt(OffsetDateTime.now());

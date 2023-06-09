@@ -7,8 +7,7 @@ spring:
     name: patient-service
   data:
     mongodb:
-      uri: mongodb+srv://patient-service:pVRZ6QrLH31hcEgW@cluster0.vacjkqi.mongodb.net/patientService
-      database: patientService
+      uri: ${MONGODB_URI:mongodb://localhost:27017}/patientService
   jpa:
     hibernate:
       ddl-auto: validate
@@ -21,3 +20,7 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+kafka:
+  topics:
+    new-patients: user-service-new-patients
+    new-patients-group-id: group-1
