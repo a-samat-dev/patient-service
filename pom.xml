@@ -21,20 +21,14 @@
         <modelmapper.version>3.1.0</modelmapper.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <spring-boot-starter-aop.version>3.0.4</spring-boot-starter-aop.version>
-        <sonar.organization>a-samat-dev</sonar.organization>
+        <sonar.language>java</sonar.language>
+        <jacoco.version>0.8.10</jacoco.version>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>a-samat-dev</sonar.organization>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
-<!--        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
         <sonar.language>java</sonar.language>
-<!--        <sonar.coverage.exclusions>-->
-<!--            **/config/*.java,-->
-<!--            **/model/*.java,-->
-<!--            **/model/**/*.java,-->
-<!--            kz/smarthealth/patientservice/PatientServiceApplication.java-->
-<!--        </sonar.coverage.exclusions>-->
-        <jacoco.version>0.8.10</jacoco.version>
     </properties>
     <dependencies>
         <dependency>
@@ -152,13 +146,14 @@
                 <version>${jacoco.version}</version>
                 <executions>
                     <execution>
+                        <id>jacoco-initialize</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>report</id>
-                        <phase>test</phase>
+                        <id>jacoco-site</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
