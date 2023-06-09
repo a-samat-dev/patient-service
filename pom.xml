@@ -21,8 +21,8 @@
         <modelmapper.version>3.1.0</modelmapper.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <spring-boot-starter-aop.version>3.0.4</spring-boot-starter-aop.version>
-        <sonar.language>java</sonar.language>
         <jacoco.version>0.8.10</jacoco.version>
+        <sonar.language>java</sonar.language>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.organization>a-samat-dev</sonar.organization>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>

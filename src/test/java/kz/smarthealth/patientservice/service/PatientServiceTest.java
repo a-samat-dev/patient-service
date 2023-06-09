@@ -152,13 +152,13 @@ class PatientServiceTest {
         // given
         UUID userId = UUID.randomUUID();
         PatientDocument patientDocument = getPatientEntity();
+        String patientId = patientDocument.getId();
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(SecurityContextHolder.getContext().getAuthentication().getName()).thenReturn(userId.toString());
-        when(patientRepository.findById(patientDocument.getId())).thenReturn(Optional.of(patientDocument));
+        when(patientRepository.findById(patientId)).thenReturn(Optional.of(patientDocument));
         // when
-        CustomException exception = assertThrows(CustomException.class,
-                () -> underTest.deletePatientById(patientDocument.getId()));
+        CustomException exception = assertThrows(CustomException.class, () -> underTest.deletePatientById(patientId));
         // then
         assertEquals(HttpStatus.FORBIDDEN, exception.getHttpStatus());
         reset(authentication);
