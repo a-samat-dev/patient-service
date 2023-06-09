@@ -26,10 +26,8 @@ jobs:
         java-version: '17'
         distribution: 'corretto'
         cache: maven
-    - name: Build with Maven
-      run: mvn clean test package
     - name: Build and analyze
-      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=a-samat-dev_patient-service
+      run: mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=a-samat-dev_patient-service
     - name: Log in to Docker Hub
       run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: Build the Docker image
