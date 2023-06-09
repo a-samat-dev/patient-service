@@ -28,12 +28,12 @@
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
 <!--        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
         <sonar.language>java</sonar.language>
-        <sonar.coverage.exclusions>
-            **/config/*.java,
-            **/model/*.java,
-            **/model/**/*.java,
-            kz/smarthealth/patientservice/PatientServiceApplication.java
-        </sonar.coverage.exclusions>
+<!--        <sonar.coverage.exclusions>-->
+<!--            **/config/*.java,-->
+<!--            **/model/*.java,-->
+<!--            **/model/**/*.java,-->
+<!--            kz/smarthealth/patientservice/PatientServiceApplication.java-->
+<!--        </sonar.coverage.exclusions>-->
         <jacoco.version>0.8.10</jacoco.version>
     </properties>
     <dependencies>
