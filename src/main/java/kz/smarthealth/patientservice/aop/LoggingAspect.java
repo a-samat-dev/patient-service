@@ -19,12 +19,12 @@ public class LoggingAspect {
 
     @Before("logPointcut() && args(obj)")
     public void beforeAdvice(JoinPoint joinPoint, Object obj) {
-        log.info("Incoming request from {}, args: {}", joinPoint.getSignature().toShortString(), obj);
+        log.info("Method call: {}, args: {}", joinPoint.getSignature().toShortString(), obj);
     }
 
     @AfterThrowing(value = "logPointcut()", throwing = "exception")
     public void afterThrowingAdvice(JoinPoint joinPoint, Throwable exception) {
-        log.error("Exception thrown in {}, exception message: {}", joinPoint.getSignature().toShortString(),
+        log.error("Exception thrown: {}, exception message: {}", joinPoint.getSignature().toShortString(),
                 exception.getMessage());
     }
 }

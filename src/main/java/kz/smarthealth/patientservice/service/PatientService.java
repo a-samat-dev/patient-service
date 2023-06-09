@@ -1,6 +1,5 @@
 package kz.smarthealth.patientservice.service;
 
-import kz.smarthealth.patientservice.aop.Log;
 import kz.smarthealth.patientservice.exception.CustomException;
 import kz.smarthealth.patientservice.model.dto.PatientDTO;
 import kz.smarthealth.patientservice.model.entity.PatientDocument;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static kz.smarthealth.patientservice.util.MessageSource.PATIENT_BY_ID_NOT_FOUND;
 
@@ -30,7 +28,6 @@ public class PatientService {
      * @param patientDTO patient data
      * @return newly created patient
      */
-    @Log
     public PatientDTO savePatient(PatientDTO patientDTO) {
         PatientDocument patientDocument = modelMapper.map(patientDTO, PatientDocument.class);
         patientDocument.setCreatedAt(OffsetDateTime.now());
@@ -45,7 +42,6 @@ public class PatientService {
      * @param id patient id
      * @return existing patient
      */
-    @Log
     public PatientDTO getPatientById(String id) {
         PatientDocument patientDocument = getPatientEntityById(id);
 

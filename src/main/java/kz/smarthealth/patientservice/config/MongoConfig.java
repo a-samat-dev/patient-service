@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
@@ -17,7 +18,9 @@ public class MongoConfig {
     public MongoCustomConversions mongoCustomConversions() {
         return new MongoCustomConversions(Arrays.asList(
                 new OffsetDateTimeReadConverter(),
-                new OffsetDateTimeWriteConverter()
+                new OffsetDateTimeWriteConverter(),
+                new LocalDateWriteConverter(),
+                new LocalDateReadConverter()
         ));
     }
 
@@ -34,6 +37,22 @@ public class MongoConfig {
         @Override
         public OffsetDateTime convert(Date source) {
             return source.toInstant().atOffset(ZoneOffset.UTC);
+        }
+    }
+
+    static class LocalDateWriteConverter implements Converter<LocalDate, Date> {
+
+        @Override
+        public Date convert(LocalDate source) {
+            return Date.from(source.atStartOfDay().toInstant(ZoneOffset.UTC));
+        }
+    }
+
+    static class LocalDateReadConverter implements Converter<Date, LocalDate> {
+
+        @Override
+        public LocalDate convert(Date source) {
+            return source.toInstant().atOffset(ZoneOffset.UTC).toLocalDate();
         }
     }
 }
