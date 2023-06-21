@@ -1,0 +1,9 @@
+spring:
+  kafka:
+    properties:
+      security.protocol: SASL_SSL
+      sasl:
+        mechanism: PLAIN
+        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username='MG5K675ABBHXLFJQ' password='ksiwvxjzh85WsSv7zW3pGbAETV/8cZv2L/3RjiJTBsUIl7wH1hBzSdNp0KMdJSRB';
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer

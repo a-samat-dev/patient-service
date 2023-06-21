@@ -15,11 +15,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
-    consumer:
-      bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    properties:
+      session.timeout.ms: 45000
+      bootstrap.servers: ${KAFKA_BROKERS:localhost:9092}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 kafka:
   topics:
     new-patients: user-service-new-patients
