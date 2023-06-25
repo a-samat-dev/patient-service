@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: dev-patient-service-deployment
-          image: asamatdev/sh-patient-service:3
+          image: asamatdev/sh-patient-service:4
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
